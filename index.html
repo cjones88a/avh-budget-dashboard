@@ -1,0 +1,725 @@
+<title>AVH Budget Burndown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: light;
+    --surface-page:  #f9f9f7;
+    --surface-card:  #fcfcfb;
+    --surface-card-2:#f2f1ec;
+    --ink:           #14130f;
+    --ink-2:         #52514e;
+    --ink-muted:     #898781;
+    --grid:          #e1e0d9;
+    --baseline:      #c3c2b7;
+    --border:        rgba(11,11,11,0.10);
+    --border-strong: rgba(11,11,11,0.16);
+
+    --planning:  #2a78d6;
+    --development:#eb6834;
+    --pm:        #1baf7a;
+    --ux:        #eda100;
+
+    --seq-track-light: #dce9fb;
+    --seq-fill:  #2a78d6;
+
+    --good: #0ca30c;
+    --warning: #c98100;
+    --critical: #d03b3b;
+
+    --shadow: 0 1px 2px rgba(20,19,15,0.04), 0 8px 24px -12px rgba(20,19,15,0.14);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --surface-page:  #0d0d0c;
+      --surface-card:  #1a1a19;
+      --surface-card-2:#222221;
+      --ink:           #fbfbfa;
+      --ink-2:         #c3c2b7;
+      --ink-muted:     #8f8d86;
+      --grid:          #2c2c2a;
+      --baseline:      #3a3a37;
+      --border:        rgba(255,255,255,0.10);
+      --border-strong: rgba(255,255,255,0.18);
+
+      --planning:  #3987e5;
+      --development:#e07333;
+      --pm:        #199e70;
+      --ux:        #c98500;
+
+      --seq-track-light: #1e344f;
+      --seq-fill:  #3987e5;
+
+      --good: #0ca30c;
+      --warning: #e3a437;
+      --critical: #e66767;
+
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 28px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --surface-page:  #0d0d0c;
+    --surface-card:  #1a1a19;
+    --surface-card-2:#222221;
+    --ink:           #fbfbfa;
+    --ink-2:         #c3c2b7;
+    --ink-muted:     #8f8d86;
+    --grid:          #2c2c2a;
+    --baseline:      #3a3a37;
+    --border:        rgba(255,255,255,0.10);
+    --border-strong: rgba(255,255,255,0.18);
+
+    --planning:  #3987e5;
+    --development:#e07333;
+    --pm:        #199e70;
+    --ux:        #c98500;
+
+    --seq-track-light: #1e344f;
+    --seq-fill:  #3987e5;
+
+    --good: #0ca30c;
+    --warning: #e3a437;
+    --critical: #e66767;
+
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 28px -12px rgba(0,0,0,0.5);
+  }
+
+  *{ box-sizing: border-box; }
+  body{
+    background: var(--surface-page);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 40px 28px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  h1,h2,h3{ font-family:"Zilla Slab", Georgia, serif; font-weight:600; margin:0; text-wrap:balance; }
+  .mono{ font-family:"IBM Plex Mono", ui-monospace, SFMono-Regular, monospace; }
+  .tnum{ font-variant-numeric: tabular-nums; }
+
+  /* ---------- header ---------- */
+  header.top{ display:flex; flex-direction:column; gap:6px; }
+  .eyebrow{
+    font-family:"IBM Plex Mono", monospace;
+    font-size: 12px; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  header.top h1{ font-size: 34px; line-height:1.1; }
+  .meta-line{
+    display:flex; flex-wrap:wrap; gap: 6px 18px;
+    color: var(--ink-2); font-size: 13.5px; margin-top: 4px;
+  }
+  .meta-line b{ color: var(--ink); font-weight:600; }
+  .dot-sep{ color: var(--ink-muted); }
+
+  /* ---------- KPI row ---------- */
+  .kpi-row{
+    display:grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap:1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .kpi{
+    background: var(--surface-card);
+    padding: 20px 22px;
+    display:flex; flex-direction:column; gap:8px;
+    min-width:0;
+  }
+  .kpi .label{ font-size:12.5px; color: var(--ink-2); }
+  .kpi .value{ font-size: 27px; font-weight:600; line-height:1.05; }
+  .kpi .sub{ font-size:12.5px; color: var(--ink-muted); }
+  .kpi .value .unit{ font-size: 15px; font-weight:500; color: var(--ink-2); margin-left:3px; }
+
+  /* ---------- section shell ---------- */
+  section.card{
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 26px 26px 22px;
+  }
+  .section-head{
+    display:flex; justify-content:space-between; align-items:flex-end; gap:16px;
+    margin-bottom: 18px; flex-wrap:wrap;
+  }
+  .section-head h2{ font-size: 20px; }
+  .section-head p{ margin:4px 0 0; color: var(--ink-2); font-size: 13.5px; max-width:52ch; }
+  .section-stat{ text-align:right; }
+  .section-stat .value{ font-size:22px; font-weight:600; }
+  .section-stat .label{ font-size:12px; color: var(--ink-muted); }
+
+  /* ---------- burndown chart ---------- */
+  .chart-shell{ position:relative; }
+  svg.burndown{ width:100%; height:auto; display:block; overflow:visible; }
+  .axis-label{ fill: var(--ink-muted); font-size:11px; font-family:"IBM Plex Mono", monospace; }
+  .grid-line{ stroke: var(--grid); stroke-width:1; }
+  .baseline-line{ stroke: var(--baseline); stroke-width:1; }
+  .budget-cap{ stroke: var(--ink-muted); stroke-width:1.5; stroke-dasharray: 3 4; fill:none; }
+  .budget-cap-label{ fill: var(--ink-2); font-size:11.5px; font-family:"IBM Plex Mono", monospace; }
+  .area-fill{ fill: var(--seq-fill); opacity:0.12; }
+  .burn-line{ fill:none; stroke: var(--seq-fill); stroke-width:2; stroke-linejoin:round; stroke-linecap:round; }
+  .burn-point{ fill: var(--seq-fill); stroke: var(--surface-card); stroke-width:2; }
+  .burn-hit{ fill: transparent; cursor:pointer; }
+  .burn-point-end{ fill: var(--seq-fill); stroke: var(--surface-card); stroke-width:2.5; }
+  .end-label{ font-family:"IBM Plex Mono", monospace; font-size:12px; font-weight:600; fill: var(--ink); }
+  .end-label-sub{ font-family:"IBM Plex Mono", monospace; font-size:10.5px; fill: var(--ink-muted); }
+  .guide-line{ stroke: var(--ink-muted); stroke-width:1; opacity:0; pointer-events:none; }
+
+  .tooltip{
+    position:absolute; pointer-events:none; z-index:5;
+    background: var(--ink); color: var(--surface-card);
+    border-radius:8px; padding:9px 12px; font-size:12.5px; line-height:1.5;
+    box-shadow: 0 10px 24px -8px rgba(0,0,0,0.35);
+    opacity:0; transform: translate(-50%, calc(-100% - 10px)); transition: opacity .08s ease;
+    white-space:nowrap;
+  }
+  .tooltip.show{ opacity:1; }
+  .tooltip .t-date{ font-family:"IBM Plex Mono", monospace; font-size:11px; color: rgba(255,255,255,0.6); margin-bottom:3px; }
+  .tooltip .t-row{ display:flex; gap:10px; justify-content:space-between; }
+  .tooltip .t-row + .t-row{ margin-top:2px; }
+  .tooltip .t-val{ font-weight:600; font-variant-numeric: tabular-nums; }
+
+  /* ---------- phase groups / meters ---------- */
+  .phase-group + .phase-group{ margin-top: 22px; }
+  .phase-head{
+    display:flex; align-items:center; gap:9px;
+    margin-bottom:10px;
+  }
+  .phase-swatch{ width:10px; height:10px; border-radius:2.5px; flex:none; }
+  .phase-head h3{ font-family:"IBM Plex Sans",sans-serif; font-weight:600; font-size:13px;
+    text-transform:uppercase; letter-spacing:.06em; color: var(--ink-2); }
+  .phase-head .phase-tally{ font-size:12px; color: var(--ink-muted); margin-left:2px; }
+
+  .meter-row{
+    display:grid;
+    grid-template-columns: 250px 1fr 110px 56px;
+    align-items:center;
+    gap: 16px;
+    padding: 9px 6px;
+    border-radius:8px;
+  }
+  .meter-row:hover, .meter-row:focus-within{ background: var(--surface-card-2); }
+  .meter-id{ display:flex; flex-direction:column; gap:1px; min-width:0; }
+  .meter-code{ font-family:"IBM Plex Mono", monospace; font-size:12px; color: var(--ink-muted); }
+  .meter-name{ font-size:13.5px; color: var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .meter-track{
+    position:relative; height:10px; border-radius:5px;
+    background: var(--surface-card-2);
+    border: 1px solid var(--border);
+    overflow:hidden;
+  }
+  .meter-fill{ position:absolute; inset:0 auto 0 0; border-radius:5px; background: var(--seq-fill); }
+  .meter-fill.warning{ background: var(--warning); }
+  .meter-fill.critical{ background: var(--critical); }
+  .meter-hit{ position:absolute; inset:-8px 0; cursor:pointer; }
+  .meter-figures{ font-family:"IBM Plex Mono", monospace; font-size:12.5px; color: var(--ink-2); text-align:right;
+    font-variant-numeric: tabular-nums; white-space:nowrap; }
+  .meter-figures b{ color: var(--ink); font-weight:600; }
+  .meter-pct{ text-align:right; font-size:12.5px; font-weight:600; font-variant-numeric: tabular-nums; }
+  .meter-pct.zero{ color: var(--ink-muted); font-weight:400; }
+  .meter-head-row{
+    display:grid; grid-template-columns: 250px 1fr 110px 56px; gap:16px;
+    padding: 0 6px 6px; font-size:11px; color: var(--ink-muted);
+    text-transform:uppercase; letter-spacing:.05em;
+  }
+  .meter-head-row span:nth-child(3), .meter-head-row span:nth-child(4){ text-align:right; }
+
+  /* ---------- activity table ---------- */
+  .activity-scroll{ overflow-x:auto; }
+  table.activity{ width:100%; border-collapse:collapse; font-size:13.5px; min-width:600px; }
+  table.activity th{
+    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+    color: var(--ink-muted); font-weight:600; padding: 0 10px 8px; border-bottom:1px solid var(--border-strong);
+  }
+  table.activity td{ padding: 9px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+  table.activity tr:last-child td{ border-bottom:none; }
+  table.activity td.hrs{ font-family:"IBM Plex Mono", monospace; text-align:right; font-variant-numeric: tabular-nums; white-space:nowrap; }
+  table.activity td.date{ font-family:"IBM Plex Mono", monospace; color: var(--ink-2); white-space:nowrap; }
+  table.activity td.code{ font-family:"IBM Plex Mono", monospace; font-size:12px; color: var(--ink-2); }
+  table.activity td.person{ white-space:nowrap; color: var(--ink-2); }
+
+  .swatch-planning{ background: var(--planning); }
+  .swatch-development{ background: var(--development); }
+  .swatch-pm{ background: var(--pm); }
+  .swatch-ux{ background: var(--ux); }
+
+  /* ---------- footer ---------- */
+  footer.notes{
+    display:flex; flex-direction:column; gap:8px;
+    color: var(--ink-muted); font-size:12.5px; line-height:1.6;
+    border-top:1px solid var(--border); padding-top:20px;
+  }
+  footer.notes b{ color: var(--ink-2); }
+
+  @media (max-width: 720px){
+    .kpi-row{ grid-template-columns: repeat(2,1fr); }
+    .meter-row, .meter-head-row{ grid-template-columns: 1fr; row-gap:6px; }
+    .meter-figures, .meter-pct{ text-align:left; }
+    .section-head{ flex-direction:column; align-items:flex-start; }
+    .section-stat{ text-align:left; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">Mapleton Hill · Aspen Valley Health</div>
+    <h1>AVH Contentful Migration — Budget Burndown</h1>
+    <div class="meta-line">
+      <span>As of <b>Sep 3, 2026</b></span>
+      <span class="dot-sep">·</span>
+      <span><b>$160</b>/hr blended rate</span>
+      <span class="dot-sep">·</span>
+      <span><b>22</b> itemized scope lines</span>
+      <span class="dot-sep">·</span>
+      <span>Source: AVH Scope &amp; Time Tracker</span>
+    </div>
+  </header>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="label">Total budget</div>
+      <div class="value tnum">791<span class="unit">hrs</span></div>
+      <div class="sub tnum">$126,560 at $160/hr</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Logged to date</div>
+      <div class="value tnum">60.0<span class="unit">hrs</span></div>
+      <div class="sub tnum">$9,600 invoiced value</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Remaining</div>
+      <div class="value tnum">731<span class="unit">hrs</span></div>
+      <div class="sub tnum">$116,960 left to burn</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Budget consumed</div>
+      <div class="value tnum">7.6<span class="unit">%</span></div>
+      <div class="sub">5 of 22 lines started</div>
+    </div>
+  </div>
+
+  <section class="card" id="total-burndown">
+    <div class="section-head">
+      <div>
+        <h2>Total burndown</h2>
+        <p>Cumulative hours logged against the 791&#8209;hour scope budget, Jul 28 – Sep 3.</p>
+      </div>
+      <div class="section-stat">
+        <div class="value tnum">92.4%</div>
+        <div class="label">of budget remaining</div>
+      </div>
+    </div>
+    <div class="chart-shell" id="chart-shell">
+      <svg class="burndown" id="burndown-svg" viewBox="0 0 1000 340" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="tooltip" id="chart-tooltip">
+        <div class="t-date" id="tt-date"></div>
+        <div class="t-row"><span>Logged (cumulative)</span><span class="t-val" id="tt-hours"></span></div>
+        <div class="t-row"><span>Remaining</span><span class="t-val" id="tt-remaining"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="line-item-burndown">
+    <div class="section-head">
+      <div>
+        <h2>Burndown by line item</h2>
+        <p>Actual hours logged against the estimate for each scope code, grouped by phase.</p>
+      </div>
+      <div class="section-stat">
+        <div class="value tnum">5 / 22</div>
+        <div class="label">lines with logged time</div>
+      </div>
+    </div>
+
+    <div class="meter-head-row">
+      <span>Line item</span>
+      <span>Actual vs. budgeted hours</span>
+      <span>Hours</span>
+      <span>Used</span>
+    </div>
+    <div id="meter-groups"></div>
+
+    <div class="tooltip" id="meter-tooltip">
+      <div class="t-date" id="mt-code"></div>
+      <div class="t-row"><span>Actual</span><span class="t-val" id="mt-actual"></span></div>
+      <div class="t-row"><span>Budgeted</span><span class="t-val" id="mt-budget"></span></div>
+      <div class="t-row"><span>Remaining</span><span class="t-val" id="mt-remaining"></span></div>
+    </div>
+  </section>
+
+  <section class="card" id="recent-activity">
+    <div class="section-head">
+      <div>
+        <h2>Recent time entries</h2>
+        <p>Latest rows from the weekly time&#8209;log screenshot, newest first.</p>
+      </div>
+    </div>
+    <div class="activity-scroll">
+      <table class="activity" id="activity-table">
+        <thead>
+          <tr><th>Date</th><th>Person</th><th>Code</th><th>Description</th><th style="text-align:right;">Hours</th></tr>
+        </thead>
+        <tbody id="activity-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="notes">
+    <div><b>Reading the numbers:</b> hours are the source of truth; dollar figures are hours × the $160/hr blended rate used in the Scope &amp; Time Tracker. $126,560 across 791 hours is the agreed budget — AVH19 (documentation &amp; editor training) is priced at $0 since AVH owns that work, so it's excluded from the tracked hours and dollars. A separate $10,000 early&#8209;acceptance discount, applied through Aug 28, 2026, brings the net contract total to $116,560; that discount isn't spread across line items, so it isn't reflected in the per&#8209;item burndown below.</div>
+    <div><b>Assumptions:</b> entries logged as "AHV21" were normalized to AVH21 (Project management &amp; coordination), likely a typo in the time tool. 0.5 hrs logged as plain "Standup" with no code were folded into AVH21. AVH19 and AVH20 carry no budgeted hours and show as empty lines.</div>
+    <div><b>Updating this dashboard:</b> each week, send Claude the new time&#8209;log screenshot — the entries get reconciled against this data and the page is republished with the new totals.</div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var RATE = 160;
+  var TOTAL_BUDGET_HOURS = 791;
+
+  var timeSeries = [
+    {date:"2026-07-28", cum:4},
+    {date:"2026-07-30", cum:6},
+    {date:"2026-08-03", cum:8},
+    {date:"2026-08-04", cum:10.5},
+    {date:"2026-08-05", cum:11},
+    {date:"2026-08-06", cum:12},
+    {date:"2026-08-07", cum:14},
+    {date:"2026-08-11", cum:17},
+    {date:"2026-08-12", cum:21},
+    {date:"2026-08-13", cum:23},
+    {date:"2026-08-20", cum:24},
+    {date:"2026-08-31", cum:42},
+    {date:"2026-09-01", cum:54.75},
+    {date:"2026-09-02", cum:57.75},
+    {date:"2026-09-03", cum:60}
+  ];
+
+  var budgetItems = [
+    {phase:"Planning",    code:"AVH01", name:"Content architecture & Contentful schema design", est:36,  actual:5.5},
+    {phase:"Planning",    code:"AVH02", name:"WordPress → Contentful migration mapping",     est:34,  actual:0},
+    {phase:"Development", code:"AVH03", name:"Infrastructure & environment setup",               est:40,  actual:1},
+    {phase:"Development", code:"AVH04", name:"Global chrome & navigation components",             est:60,  actual:0},
+    {phase:"Development", code:"AVH05", name:"Pages & block library",                             est:100, actual:0},
+    {phase:"Development", code:"AVH06", name:"Full content & asset migration",                    est:80,  actual:0},
+    {phase:"Development", code:"AVH07", name:"Migrate collection listings",                       est:60,  actual:0},
+    {phase:"Development", code:"AVH08", name:"Provider Finder",                                   est:16,  actual:1},
+    {phase:"Development", code:"AVH09", name:"Location Directory",                                est:16,  actual:0},
+    {phase:"Development", code:"AVH10", name:"People Finder",                                     est:16,  actual:0},
+    {phase:"Development", code:"AVH11", name:"Events page + plugin",                              est:24,  actual:0},
+    {phase:"Development", code:"AVH12", name:"Forms & email integration",                         est:32,  actual:0},
+    {phase:"Development", code:"AVH13", name:"Site-wide search",                                  est:49,  actual:0},
+    {phase:"Development", code:"AVH14", name:"SEO implementation",                                est:16,  actual:0},
+    {phase:"Development", code:"AVH15", name:"Analytics tracking setup",                          est:8,   actual:0},
+    {phase:"Development", code:"AVH16", name:"Contentful backup plan & training",                 est:8,   actual:0},
+    {phase:"Development", code:"AVH17", name:"Security review",                                   est:16,  actual:0},
+    {phase:"Development", code:"AVH18", name:"Final cutover",                                     est:8,   actual:0},
+    {phase:"PM",          code:"AVH19", name:"Documentation & editor training (AVH owns)",         est:0,   actual:0},
+    {phase:"PM",          code:"AVH20", name:"Content governance & publishing roles",              est:0,   actual:0},
+    {phase:"PM",          code:"AVH21", name:"Project management & coordination",                 est:140, actual:34.5},
+    {phase:"UX",          code:"AVH23", name:"Design final audit / QA",                            est:32,  actual:18}
+  ];
+
+  var recent = [
+    {date:"Sep 3", person:"Colt Jones",    code:"AVH21", desc:"Standup + backlog refinement",              hrs:2.00},
+    {date:"Sep 3", person:"Ehren Dames",   code:"—",     desc:"Standup",                                   hrs:0.25},
+    {date:"Sep 2", person:"Colt Jones",    code:"AVH21", desc:"Backlog creation",                           hrs:3.00},
+    {date:"Sep 1", person:"Colt Jones",    code:"AVH21", desc:"Project setup, Linear, Claude prep",         hrs:4.00},
+    {date:"Sep 1", person:"Ehren Dames",   code:"—",     desc:"Standup",                                   hrs:0.25},
+    {date:"Sep 1", person:"Ehren Dames",   code:"AVH21", desc:"Internal kickoff",                           hrs:1.00},
+    {date:"Sep 1", person:"Geoffrey Lehr", code:"AVH01", desc:"Component and content modeling",             hrs:5.50},
+    {date:"Sep 1", person:"Geoffrey Lehr", code:"AVH03", desc:"Infra setup / planning",                     hrs:1.00},
+    {date:"Sep 1", person:"Geoffrey Lehr", code:"AVH21", desc:"Internal kickoff",                           hrs:1.00},
+    {date:"Aug 31",person:"Jaquelyn Walo", code:"AVH23", desc:"August hours migrated from T&M project",     hrs:18.00},
+    {date:"Aug 20",person:"Colt Jones",    code:"AVH21", desc:"Standup & design review",                    hrs:1.00},
+    {date:"Aug 13",person:"Colt Jones",    code:"AVH21", desc:"Standup + project timeline",                 hrs:2.00}
+  ];
+
+  var PHASE_COLOR = { Planning:"var(--planning)", Development:"var(--development)", PM:"var(--pm)", UX:"var(--ux)" };
+  var PHASE_SWATCH_CLASS = { Planning:"swatch-planning", Development:"swatch-development", PM:"swatch-pm", UX:"swatch-ux" };
+
+  function fmtHrs(n){
+    var r = Math.round(n*10)/10;
+    return (r % 1 === 0 ? r.toFixed(0) : r.toFixed(1)) + " hrs";
+  }
+  function fmtUSD(n){
+    return "$" + Math.round(n).toLocaleString("en-US");
+  }
+  function fmtDateLabel(iso){
+    var d = new Date(iso + "T00:00:00");
+    return d.toLocaleDateString("en-US", {month:"short", day:"numeric"});
+  }
+
+  /* ---------------- total burndown chart ---------------- */
+  (function buildChart(){
+    var svg = document.getElementById("burndown-svg");
+    var ns = "http://www.w3.org/2000/svg";
+    var W = 1000, H = 340;
+    var padL = 46, padR = 20, padT = 38, padB = 34;
+    var plotW = W - padL - padR;
+    var plotH = H - padT - padB;
+
+    var yMax = 1000; // headroom above the 807 budget cap
+    var startMs = new Date(timeSeries[0].date + "T00:00:00").getTime();
+    var endMs = new Date(timeSeries[timeSeries.length-1].date + "T00:00:00").getTime();
+    var spanMs = Math.max(1, endMs - startMs);
+
+    function xFor(iso){
+      var ms = new Date(iso + "T00:00:00").getTime();
+      return padL + ((ms - startMs) / spanMs) * plotW;
+    }
+    function yFor(v){
+      return padT + plotH - (v / yMax) * plotH;
+    }
+
+    function el(tag, attrs){
+      var e = document.createElementNS(ns, tag);
+      for (var k in attrs) e.setAttribute(k, attrs[k]);
+      return e;
+    }
+
+    // gridlines + y ticks
+    var yTicks = [0, 250, 500, 750, 1000];
+    yTicks.forEach(function(t){
+      var y = yFor(t);
+      svg.appendChild(el("line", {x1:padL, x2:W-padR, y1:y, y2:y, class:"grid-line"}));
+      var lbl = el("text", {x:padL-10, y:y+4, class:"axis-label", "text-anchor":"end"});
+      lbl.textContent = t.toLocaleString("en-US");
+      svg.appendChild(lbl);
+    });
+    svg.appendChild(el("line", {x1:padL, x2:padL, y1:padT, y2:H-padB, class:"baseline-line"}));
+    svg.appendChild(el("line", {x1:padL, x2:W-padR, y1:H-padB, y2:H-padB, class:"baseline-line"}));
+
+    // budget cap line
+    var capY = yFor(TOTAL_BUDGET_HOURS);
+    svg.appendChild(el("line", {x1:padL, x2:W-padR, y1:capY, y2:capY, class:"budget-cap"}));
+    var capLabel = el("text", {x:W-padR, y:capY-8, class:"budget-cap-label", "text-anchor":"end"});
+    capLabel.textContent = "791 hrs budgeted";
+    svg.appendChild(capLabel);
+
+    // x-axis date labels (first, ~middle, last)
+    var labelIdx = [0, 5, 9, timeSeries.length-1];
+    labelIdx.forEach(function(i){
+      var pt = timeSeries[i];
+      var x = xFor(pt.date);
+      var lbl = el("text", {x:x, y:H-padB+18, class:"axis-label", "text-anchor": i===0 ? "start" : (i===timeSeries.length-1 ? "end" : "middle")});
+      lbl.textContent = fmtDateLabel(pt.date);
+      svg.appendChild(lbl);
+    });
+
+    // area path
+    var linePts = timeSeries.map(function(p){ return [xFor(p.date), yFor(p.cum)]; });
+    var areaD = "M" + linePts[0][0] + "," + yFor(0);
+    linePts.forEach(function(p){ areaD += " L" + p[0] + "," + p[1]; });
+    areaD += " L" + linePts[linePts.length-1][0] + "," + yFor(0) + " Z";
+    svg.appendChild(el("path", {d:areaD, class:"area-fill"}));
+
+    var lineD = "M" + linePts.map(function(p){ return p[0]+","+p[1]; }).join(" L");
+    svg.appendChild(el("path", {d:lineD, class:"burn-line"}));
+
+    // guide line for hover
+    var guide = el("line", {x1:0, x2:0, y1:padT, y2:H-padB, class:"guide-line"});
+    svg.appendChild(guide);
+
+    // points + hit targets
+    var pointEls = [];
+    timeSeries.forEach(function(p, i){
+      var x = xFor(p.date), y = yFor(p.cum);
+      var isLast = i === timeSeries.length - 1;
+      var dot = el("circle", {cx:x, cy:y, r: isLast ? 5 : 3.5, class: isLast ? "burn-point-end" : "burn-point"});
+      svg.appendChild(dot);
+      var hit = el("circle", {cx:x, cy:y, r:14, class:"burn-hit", tabindex:"0", role:"img",
+        "aria-label": fmtDateLabel(p.date) + ": " + fmtHrs(p.cum) + " logged, " + fmtHrs(TOTAL_BUDGET_HOURS - p.cum) + " remaining"});
+      svg.appendChild(hit);
+      pointEls.push({x:x, y:y, data:p, hit:hit});
+    });
+
+    // end label
+    var endPt = linePts[linePts.length-1];
+    var endLbl = el("text", {x:endPt[0]-10, y:endPt[1]-10, class:"end-label", "text-anchor":"end"});
+    endLbl.textContent = "60.0 hrs";
+    svg.appendChild(endLbl);
+    var endSub = el("text", {x:endPt[0]-10, y:endPt[1]+6, class:"end-label-sub", "text-anchor":"end"});
+    endSub.textContent = "as of Sep 3";
+    svg.appendChild(endSub);
+
+    // tooltip wiring
+    var shell = document.getElementById("chart-shell");
+    var tooltip = document.getElementById("chart-tooltip");
+    var ttDate = document.getElementById("tt-date");
+    var ttHours = document.getElementById("tt-hours");
+    var ttRemaining = document.getElementById("tt-remaining");
+
+    function showFor(pt){
+      var rect = svg.getBoundingClientRect();
+      var scale = rect.width / W;
+      guide.setAttribute("x1", pt.x); guide.setAttribute("x2", pt.x);
+      guide.style.opacity = 1;
+      ttDate.textContent = fmtDateLabel(pt.data.date) + ", 2026";
+      ttHours.textContent = fmtHrs(pt.data.cum);
+      ttRemaining.textContent = fmtHrs(TOTAL_BUDGET_HOURS - pt.data.cum);
+      tooltip.style.left = (pt.x * scale) + "px";
+      tooltip.style.top = (pt.y * scale) + "px";
+      tooltip.classList.add("show");
+    }
+    function hideAll(){ guide.style.opacity = 0; tooltip.classList.remove("show"); }
+
+    pointEls.forEach(function(pt){
+      pt.hit.addEventListener("mouseenter", function(){ showFor(pt); });
+      pt.hit.addEventListener("focus", function(){ showFor(pt); });
+      pt.hit.addEventListener("mouseleave", hideAll);
+      pt.hit.addEventListener("blur", hideAll);
+    });
+    svg.addEventListener("mouseleave", hideAll);
+  })();
+
+  /* ---------------- per-line-item meters ---------------- */
+  (function buildMeters(){
+    var container = document.getElementById("meter-groups");
+    var phases = ["Planning", "Development", "PM", "UX"];
+    var tooltip = document.getElementById("meter-tooltip");
+    var mtCode = document.getElementById("mt-code");
+    var mtActual = document.getElementById("mt-actual");
+    var mtBudget = document.getElementById("mt-budget");
+    var mtRemaining = document.getElementById("mt-remaining");
+
+    phases.forEach(function(phase){
+      var items = budgetItems.filter(function(it){ return it.phase === phase; });
+      if (!items.length) return;
+      var startedCount = items.filter(function(it){ return it.actual > 0; }).length;
+      var phaseEstTotal = items.reduce(function(s,it){ return s+it.est; }, 0);
+      var phaseActualTotal = items.reduce(function(s,it){ return s+it.actual; }, 0);
+
+      var group = document.createElement("div");
+      group.className = "phase-group";
+
+      var head = document.createElement("div");
+      head.className = "phase-head";
+      var sw = document.createElement("span");
+      sw.className = "phase-swatch " + PHASE_SWATCH_CLASS[phase];
+      var h3 = document.createElement("h3");
+      h3.textContent = phase;
+      var tally = document.createElement("span");
+      tally.className = "phase-tally";
+      tally.textContent = fmtHrs(phaseActualTotal) + " of " + fmtHrs(phaseEstTotal) + " · " + startedCount + "/" + items.length + " started";
+      head.appendChild(sw); head.appendChild(h3); head.appendChild(tally);
+      group.appendChild(head);
+
+      items.forEach(function(it){
+        var pct = it.est > 0 ? (it.actual / it.est) * 100 : 0;
+        var pctClamped = Math.min(100, pct);
+        var sevClass = "";
+        if (pct >= 100) sevClass = "critical";
+        else if (pct >= 85) sevClass = "warning";
+
+        var row = document.createElement("div");
+        row.className = "meter-row";
+
+        var idCell = document.createElement("div");
+        idCell.className = "meter-id";
+        var codeEl = document.createElement("div");
+        codeEl.className = "meter-code";
+        codeEl.textContent = it.code;
+        var nameEl = document.createElement("div");
+        nameEl.className = "meter-name";
+        nameEl.title = it.name;
+        nameEl.textContent = it.name;
+        idCell.appendChild(codeEl); idCell.appendChild(nameEl);
+
+        var trackWrap = document.createElement("div");
+        trackWrap.className = "meter-track";
+        var fill = document.createElement("div");
+        fill.className = "meter-fill" + (sevClass ? " " + sevClass : "");
+        fill.style.width = (it.est > 0 ? pctClamped : 0) + "%";
+        trackWrap.appendChild(fill);
+        var hit = document.createElement("div");
+        hit.className = "meter-hit";
+        hit.tabIndex = 0;
+        hit.setAttribute("role", "img");
+        hit.setAttribute("aria-label", it.code + ": " + fmtHrs(it.actual) + " logged of " + fmtHrs(it.est) + " budgeted");
+        trackWrap.appendChild(hit);
+
+        var figures = document.createElement("div");
+        figures.className = "meter-figures";
+        var bEl = document.createElement("b");
+        bEl.textContent = (Math.round(it.actual*10)/10);
+        figures.appendChild(bEl);
+        figures.appendChild(document.createTextNode(" / " + it.est + " hrs"));
+
+        var pctEl = document.createElement("div");
+        pctEl.className = "meter-pct" + (it.actual === 0 ? " zero" : "");
+        pctEl.textContent = it.est > 0 ? Math.round(pct) + "%" : "—";
+
+        row.appendChild(idCell);
+        row.appendChild(trackWrap);
+        row.appendChild(figures);
+        row.appendChild(pctEl);
+        group.appendChild(row);
+
+        function show(){
+          var r = hit.getBoundingClientRect();
+          var shellR = container.getBoundingClientRect();
+          mtCode.textContent = it.code + " · " + it.name;
+          mtActual.textContent = fmtHrs(it.actual) + " (" + fmtUSD(it.actual*RATE) + ")";
+          mtBudget.textContent = fmtHrs(it.est) + " (" + fmtUSD(it.est*RATE) + ")";
+          mtRemaining.textContent = fmtHrs(Math.max(0, it.est - it.actual));
+          tooltip.style.left = (r.left - shellR.left + r.width/2) + "px";
+          tooltip.style.top = (r.top - shellR.top) + "px";
+          tooltip.classList.add("show");
+        }
+        function hide(){ tooltip.classList.remove("show"); }
+        hit.addEventListener("mouseenter", show);
+        hit.addEventListener("focus", show);
+        hit.addEventListener("mouseleave", hide);
+        hit.addEventListener("blur", hide);
+      });
+
+      container.appendChild(group);
+    });
+    container.style.position = "relative";
+  })();
+
+  /* ---------------- recent activity table ---------------- */
+  (function buildTable(){
+    var body = document.getElementById("activity-body");
+    recent.forEach(function(r){
+      var tr = document.createElement("tr");
+
+      var tdDate = document.createElement("td");
+      tdDate.className = "date"; tdDate.textContent = r.date;
+
+      var tdPerson = document.createElement("td");
+      tdPerson.className = "person"; tdPerson.textContent = r.person;
+
+      var tdCode = document.createElement("td");
+      tdCode.className = "code"; tdCode.textContent = r.code;
+
+      var tdDesc = document.createElement("td");
+      tdDesc.textContent = r.desc;
+
+      var tdHrs = document.createElement("td");
+      tdHrs.className = "hrs"; tdHrs.textContent = r.hrs.toFixed(2);
+
+      tr.appendChild(tdDate); tr.appendChild(tdPerson); tr.appendChild(tdCode); tr.appendChild(tdDesc); tr.appendChild(tdHrs);
+      body.appendChild(tr);
+    });
+  })();
+
+})();
+</script>
