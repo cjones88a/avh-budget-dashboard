@@ -125,6 +125,12 @@
   }
   .meta-line b{ color: var(--ink); font-weight:600; }
   .dot-sep{ color: var(--ink-muted); }
+  .data-status{
+    font-family:"IBM Plex Mono", monospace; font-size:11.5px; color: var(--ink-muted);
+    margin-top: 2px;
+  }
+  .data-status.error{ color: var(--critical); }
+  .data-status code{ background: var(--surface-card-2); border:1px solid var(--border); border-radius:4px; padding:1px 5px; }
 
   /* ---------- KPI row ---------- */
   .kpi-row{
@@ -268,6 +274,9 @@
     border-top:1px solid var(--border); padding-top:20px;
   }
   footer.notes b{ color: var(--ink-2); }
+  footer.notes code{ background: var(--surface-card-2); border:1px solid var(--border); border-radius:4px; padding:1px 5px; font-family:"IBM Plex Mono", monospace; }
+
+  [hidden]{ display:none !important; }
 
   @media (max-width: 720px){
     .kpi-row{ grid-template-columns: repeat(2,1fr); }
@@ -286,7 +295,7 @@
     <div class="eyebrow">Mapleton Hill · Aspen Valley Health</div>
     <h1>AVH Contentful Migration — Budget Burndown</h1>
     <div class="meta-line">
-      <span>As of <b>Sep 3, 2026</b></span>
+      <span>As of <b id="asof-date">—</b></span>
       <span class="dot-sep">·</span>
       <span><b>$160</b>/hr blended rate</span>
       <span class="dot-sep">·</span>
@@ -294,28 +303,29 @@
       <span class="dot-sep">·</span>
       <span>Source: AVH Scope &amp; Time Tracker</span>
     </div>
+    <div class="data-status" id="data-status">Loading time_entries.csv…</div>
   </header>
 
   <div class="kpi-row">
     <div class="kpi">
       <div class="label">Total budget</div>
-      <div class="value tnum">791<span class="unit">hrs</span></div>
-      <div class="sub tnum">$126,560 at $160/hr</div>
+      <div class="value tnum"><span id="kpi-total-hrs">—</span><span class="unit">hrs</span></div>
+      <div class="sub tnum" id="kpi-total-usd">—</div>
     </div>
     <div class="kpi">
       <div class="label">Logged to date</div>
-      <div class="value tnum">60.0<span class="unit">hrs</span></div>
-      <div class="sub tnum">$9,600 invoiced value</div>
+      <div class="value tnum"><span id="kpi-logged-hrs">—</span><span class="unit">hrs</span></div>
+      <div class="sub tnum" id="kpi-logged-usd">—</div>
     </div>
     <div class="kpi">
       <div class="label">Remaining</div>
-      <div class="value tnum">731<span class="unit">hrs</span></div>
-      <div class="sub tnum">$116,960 left to burn</div>
+      <div class="value tnum"><span id="kpi-remaining-hrs">—</span><span class="unit">hrs</span></div>
+      <div class="sub tnum" id="kpi-remaining-usd">—</div>
     </div>
     <div class="kpi">
       <div class="label">Budget consumed</div>
-      <div class="value tnum">7.6<span class="unit">%</span></div>
-      <div class="sub">5 of 22 lines started</div>
+      <div class="value tnum"><span id="kpi-consumed-pct">—</span><span class="unit">%</span></div>
+      <div class="sub" id="kpi-lines-started">—</div>
     </div>
   </div>
 
@@ -323,10 +333,10 @@
     <div class="section-head">
       <div>
         <h2>Total burndown</h2>
-        <p>Cumulative hours logged against the 791&#8209;hour scope budget, Jul 28 – Sep 3.</p>
+        <p>Cumulative hours logged against the scope budget, <span id="burndown-date-range">—</span>.</p>
       </div>
       <div class="section-stat">
-        <div class="value tnum">92.4%</div>
+        <div class="value tnum" id="burndown-remaining-pct">—</div>
         <div class="label">of budget remaining</div>
       </div>
     </div>
@@ -347,7 +357,7 @@
         <p>Actual hours logged against the estimate for each scope code, grouped by phase.</p>
       </div>
       <div class="section-stat">
-        <div class="value tnum">5 / 22</div>
+        <div class="value tnum" id="lines-started-fraction">—</div>
         <div class="label">lines with logged time</div>
       </div>
     </div>
@@ -372,7 +382,7 @@
     <div class="section-head">
       <div>
         <h2>Recent time entries</h2>
-        <p>Latest rows from the weekly time&#8209;log screenshot, newest first.</p>
+        <p>Latest rows from <code class="mono">time_entries.csv</code>, newest first.</p>
       </div>
     </div>
     <div class="activity-scroll">
@@ -386,9 +396,9 @@
   </section>
 
   <footer class="notes">
-    <div><b>Reading the numbers:</b> hours are the source of truth; dollar figures are hours × the $160/hr blended rate used in the Scope &amp; Time Tracker. $126,560 across 791 hours is the agreed budget — AVH19 (documentation &amp; editor training) is priced at $0 since AVH owns that work, so it's excluded from the tracked hours and dollars. A separate $10,000 early&#8209;acceptance discount, applied through Aug 28, 2026, brings the net contract total to $116,560; that discount isn't spread across line items, so it isn't reflected in the per&#8209;item burndown below.</div>
-    <div><b>Assumptions:</b> entries logged as "AHV21" were normalized to AVH21 (Project management &amp; coordination), likely a typo in the time tool. 0.5 hrs logged as plain "Standup" with no code were folded into AVH21. AVH19 and AVH20 carry no budgeted hours and show as empty lines.</div>
-    <div><b>Updating this dashboard:</b> each week, send Claude the new time&#8209;log screenshot — the entries get reconciled against this data and the page is republished with the new totals.</div>
+    <div><b>Reading the numbers:</b> hours are the source of truth; dollar figures are hours × the $160/hr blended rate used in the Scope &amp; Time Tracker. $126,560 across 791 hours is the agreed budget — AVH19 (documentation &amp; editor training) is priced at $0 since AVH owns that work, so it's excluded from the tracked hours and dollars. A separate $10,000 early&#8209;acceptance discount, applied through Aug 28, 2026, brings the net contract total to $116,560; that discount isn't spread across line items, so it isn't reflected in the per&#8209;item burndown above.</div>
+    <div><b>Assumptions:</b> entries logged as "AHV21" are normalized to AVH21 (Project management &amp; coordination), likely a typo in the time tool. Entries with no leading scope code are folded into AVH21 — <span id="uncoded-note"></span> AVH19 and AVH20 carry no budgeted hours and show as empty lines.</div>
+    <div><b>Updating this dashboard:</b> replace <code class="mono">time_entries.csv</code> in this repo with the latest export from <a href="https://mapletonhillmedia.basecamphq.com/projects/15410215-contentful-build/time_entries" style="color:inherit;">Basecamp's time entries</a> (columns: <code class="mono">date,person,hours,description</code>, one row per entry, description starting with the AVH## code) and push — the page recalculates everything from the file automatically, no editing of this page required.</div>
   </footer>
 
 </div>
@@ -398,35 +408,20 @@
   "use strict";
 
   var RATE = 160;
-  var TOTAL_BUDGET_HOURS = 791;
+  var CSV_PATH = "./time_entries.csv";
 
-  var timeSeries = [
-    {date:"2026-07-28", cum:4},
-    {date:"2026-07-30", cum:6},
-    {date:"2026-08-03", cum:8},
-    {date:"2026-08-04", cum:10.5},
-    {date:"2026-08-05", cum:11},
-    {date:"2026-08-06", cum:12},
-    {date:"2026-08-07", cum:14},
-    {date:"2026-08-11", cum:17},
-    {date:"2026-08-12", cum:21},
-    {date:"2026-08-13", cum:23},
-    {date:"2026-08-20", cum:24},
-    {date:"2026-08-31", cum:42},
-    {date:"2026-09-01", cum:54.75},
-    {date:"2026-09-02", cum:57.75},
-    {date:"2026-09-03", cum:60}
-  ];
-
+  // Budget lines: the estimate side never comes from the weekly CSV — it only
+  // changes when the Scope & Time Tracker itself changes. Actual hours below
+  // are filled in after time_entries.csv loads.
   var budgetItems = [
-    {phase:"Planning",    code:"AVH01", name:"Content architecture & Contentful schema design", est:36,  actual:5.5},
+    {phase:"Planning",    code:"AVH01", name:"Content architecture & Contentful schema design", est:36,  actual:0},
     {phase:"Planning",    code:"AVH02", name:"WordPress → Contentful migration mapping",     est:34,  actual:0},
-    {phase:"Development", code:"AVH03", name:"Infrastructure & environment setup",               est:40,  actual:1},
+    {phase:"Development", code:"AVH03", name:"Infrastructure & environment setup",               est:40,  actual:0},
     {phase:"Development", code:"AVH04", name:"Global chrome & navigation components",             est:60,  actual:0},
     {phase:"Development", code:"AVH05", name:"Pages & block library",                             est:100, actual:0},
     {phase:"Development", code:"AVH06", name:"Full content & asset migration",                    est:80,  actual:0},
     {phase:"Development", code:"AVH07", name:"Migrate collection listings",                       est:60,  actual:0},
-    {phase:"Development", code:"AVH08", name:"Provider Finder",                                   est:16,  actual:1},
+    {phase:"Development", code:"AVH08", name:"Provider Finder",                                   est:16,  actual:0},
     {phase:"Development", code:"AVH09", name:"Location Directory",                                est:16,  actual:0},
     {phase:"Development", code:"AVH10", name:"People Finder",                                     est:16,  actual:0},
     {phase:"Development", code:"AVH11", name:"Events page + plugin",                              est:24,  actual:0},
@@ -439,26 +434,12 @@
     {phase:"Development", code:"AVH18", name:"Final cutover",                                     est:8,   actual:0},
     {phase:"PM",          code:"AVH19", name:"Documentation & editor training (AVH owns)",         est:0,   actual:0},
     {phase:"PM",          code:"AVH20", name:"Content governance & publishing roles",              est:0,   actual:0},
-    {phase:"PM",          code:"AVH21", name:"Project management & coordination",                 est:140, actual:34.5},
-    {phase:"UX",          code:"AVH23", name:"Design final audit / QA",                            est:32,  actual:18}
+    {phase:"PM",          code:"AVH21", name:"Project management & coordination",                 est:140, actual:0},
+    {phase:"UX",          code:"AVH23", name:"Design final audit / QA",                            est:32,  actual:0}
   ];
+  var budgetByCode = {};
+  budgetItems.forEach(function(b){ budgetByCode[b.code] = b; });
 
-  var recent = [
-    {date:"Sep 3", person:"Colt Jones",    code:"AVH21", desc:"Standup + backlog refinement",              hrs:2.00},
-    {date:"Sep 3", person:"Ehren Dames",   code:"—",     desc:"Standup",                                   hrs:0.25},
-    {date:"Sep 2", person:"Colt Jones",    code:"AVH21", desc:"Backlog creation",                           hrs:3.00},
-    {date:"Sep 1", person:"Colt Jones",    code:"AVH21", desc:"Project setup, Linear, Claude prep",         hrs:4.00},
-    {date:"Sep 1", person:"Ehren Dames",   code:"—",     desc:"Standup",                                   hrs:0.25},
-    {date:"Sep 1", person:"Ehren Dames",   code:"AVH21", desc:"Internal kickoff",                           hrs:1.00},
-    {date:"Sep 1", person:"Geoffrey Lehr", code:"AVH01", desc:"Component and content modeling",             hrs:5.50},
-    {date:"Sep 1", person:"Geoffrey Lehr", code:"AVH03", desc:"Infra setup / planning",                     hrs:1.00},
-    {date:"Sep 1", person:"Geoffrey Lehr", code:"AVH21", desc:"Internal kickoff",                           hrs:1.00},
-    {date:"Aug 31",person:"Jaquelyn Walo", code:"AVH23", desc:"August hours migrated from T&M project",     hrs:18.00},
-    {date:"Aug 20",person:"Colt Jones",    code:"AVH21", desc:"Standup & design review",                    hrs:1.00},
-    {date:"Aug 13",person:"Colt Jones",    code:"AVH21", desc:"Standup + project timeline",                 hrs:2.00}
-  ];
-
-  var PHASE_COLOR = { Planning:"var(--planning)", Development:"var(--development)", PM:"var(--pm)", UX:"var(--ux)" };
   var PHASE_SWATCH_CLASS = { Planning:"swatch-planning", Development:"swatch-development", PM:"swatch-pm", UX:"swatch-ux" };
 
   function fmtHrs(n){
@@ -473,16 +454,134 @@
     return d.toLocaleDateString("en-US", {month:"short", day:"numeric"});
   }
 
+  /* ---------------- CSV parsing (RFC4180-ish: handles quoted fields, commas, quotes) ---------------- */
+  function parseCSV(text){
+    var rows = [];
+    var row = [];
+    var field = "";
+    var inQuotes = false;
+    for (var i = 0; i < text.length; i++){
+      var c = text[i];
+      if (inQuotes){
+        if (c === '"'){
+          if (text[i+1] === '"'){ field += '"'; i++; }
+          else inQuotes = false;
+        } else field += c;
+      } else {
+        if (c === '"') inQuotes = true;
+        else if (c === ','){ row.push(field); field = ""; }
+        else if (c === '\n' || c === '\r'){
+          if (c === '\r' && text[i+1] === '\n') i++;
+          row.push(field); field = "";
+          if (row.length > 1 || row[0] !== "") rows.push(row);
+          row = [];
+        } else field += c;
+      }
+    }
+    if (field !== "" || row.length){ row.push(field); rows.push(row); }
+    if (!rows.length) return [];
+    var headers = rows[0].map(function(h){ return h.trim().toLowerCase(); });
+    return rows.slice(1).filter(function(r){ return r.some(function(c){ return c.trim() !== ""; }); }).map(function(r){
+      var obj = {};
+      headers.forEach(function(h, i){ obj[h] = (r[i] || "").trim(); });
+      return obj;
+    });
+  }
+
+  /* ---------------- code extraction: "AVH21 - Standup" -> {code:"AVH21", rest:"Standup"} ---------------- */
+  var CODE_RE = /^\s*(AVH|AHV)\s*0*([0-9]{1,2})\b[\s:.\-–—]*(.*)$/i;
+  function extractCode(desc){
+    var m = CODE_RE.exec(desc || "");
+    if (!m) return null;
+    var num = m[2].length < 2 ? "0" + m[2] : m[2];
+    return { code: "AVH" + num, rest: (m[3] || "").trim() };
+  }
+
+  function normalizeDate(raw){
+    raw = (raw || "").trim();
+    var iso = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(raw);
+    if (iso) return raw.length === 10 ? raw : (iso[1] + "-" + iso[2].padStart(2,"0") + "-" + iso[3].padStart(2,"0"));
+    var us = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(raw);
+    if (us) return us[3] + "-" + us[1].padStart(2,"0") + "-" + us[2].padStart(2,"0");
+    var d = new Date(raw);
+    if (!isNaN(d.getTime())) return d.toISOString().slice(0,10);
+    return null;
+  }
+
+  function render(entries){
+    // aggregate per code, per date
+    var uncodedHours = 0;
+    var byDate = {};
+    entries.forEach(function(e){
+      var extracted = extractCode(e.description);
+      var code = extracted ? extracted.code : null;
+      if (code && budgetByCode[code]){
+        budgetByCode[code].actual += e.hours;
+      } else {
+        uncodedHours += e.hours;
+        if (budgetByCode["AVH21"]) budgetByCode["AVH21"].actual += e.hours;
+      }
+      byDate[e.date] = (byDate[e.date] || 0) + e.hours;
+    });
+
+    var dates = Object.keys(byDate).sort();
+    var running = 0;
+    var timeSeries = dates.map(function(d){
+      running += byDate[d];
+      return { date: d, cum: Math.round(running*100)/100 };
+    });
+
+    var totalBudgetHours = budgetItems.reduce(function(s,b){ return s+b.est; }, 0);
+    var totalActualHours = timeSeries.length ? timeSeries[timeSeries.length-1].cum : 0;
+    var remainingHours = totalBudgetHours - totalActualHours;
+    var startedCount = budgetItems.filter(function(b){ return b.actual > 0; }).length;
+    var asOf = dates.length ? fmtDateLabel(dates[dates.length-1]) + ", " + dates[dates.length-1].slice(0,4) : "—";
+    var firstLabel = dates.length ? fmtDateLabel(dates[0]) : "—";
+    var lastLabel = dates.length ? fmtDateLabel(dates[dates.length-1]) : "—";
+
+    document.getElementById("asof-date").textContent = asOf;
+    document.getElementById("kpi-total-hrs").textContent = totalBudgetHours.toLocaleString("en-US");
+    document.getElementById("kpi-total-usd").textContent = fmtUSD(totalBudgetHours*RATE) + " at $160/hr";
+    document.getElementById("kpi-logged-hrs").textContent = (Math.round(totalActualHours*100)/100).toLocaleString("en-US");
+    document.getElementById("kpi-logged-usd").textContent = fmtUSD(totalActualHours*RATE) + " invoiced value";
+    document.getElementById("kpi-remaining-hrs").textContent = (Math.round(remainingHours*100)/100).toLocaleString("en-US");
+    document.getElementById("kpi-remaining-usd").textContent = fmtUSD(remainingHours*RATE) + " left to burn";
+    var consumedPct = totalBudgetHours > 0 ? (totalActualHours/totalBudgetHours*100) : 0;
+    document.getElementById("kpi-consumed-pct").textContent = consumedPct.toFixed(1);
+    document.getElementById("kpi-lines-started").textContent = startedCount + " of " + budgetItems.length + " lines started";
+    document.getElementById("burndown-date-range").textContent = firstLabel + " – " + lastLabel;
+    document.getElementById("burndown-remaining-pct").textContent = (totalBudgetHours>0 ? (remainingHours/totalBudgetHours*100) : 0).toFixed(1) + "%";
+    document.getElementById("lines-started-fraction").textContent = startedCount + " / " + budgetItems.length;
+    document.getElementById("uncoded-note").textContent = uncodedHours > 0
+      ? (Math.round(uncodedHours*100)/100) + " hrs so far had no code and were folded in this way."
+      : "none so far this snapshot.";
+
+    var statusEl = document.getElementById("data-status");
+    statusEl.textContent = "Loaded " + entries.length + " entries from time_entries.csv · through " + asOf;
+
+    buildChart(timeSeries, totalBudgetHours);
+    buildMeters();
+    buildTable(entries);
+  }
+
+  function showError(message){
+    var statusEl = document.getElementById("data-status");
+    statusEl.textContent = message;
+    statusEl.classList.add("error");
+  }
+
   /* ---------------- total burndown chart ---------------- */
-  (function buildChart(){
+  function buildChart(timeSeries, totalBudgetHours){
     var svg = document.getElementById("burndown-svg");
+    svg.innerHTML = "";
+    if (!timeSeries.length) return;
     var ns = "http://www.w3.org/2000/svg";
     var W = 1000, H = 340;
     var padL = 46, padR = 20, padT = 38, padB = 34;
     var plotW = W - padL - padR;
     var plotH = H - padT - padB;
 
-    var yMax = 1000; // headroom above the 807 budget cap
+    var yMax = Math.max(1000, Math.ceil((totalBudgetHours*1.05)/100)*100);
     var startMs = new Date(timeSeries[0].date + "T00:00:00").getTime();
     var endMs = new Date(timeSeries[timeSeries.length-1].date + "T00:00:00").getTime();
     var spanMs = Math.max(1, endMs - startMs);
@@ -494,15 +593,15 @@
     function yFor(v){
       return padT + plotH - (v / yMax) * plotH;
     }
-
     function el(tag, attrs){
       var e = document.createElementNS(ns, tag);
       for (var k in attrs) e.setAttribute(k, attrs[k]);
       return e;
     }
 
-    // gridlines + y ticks
-    var yTicks = [0, 250, 500, 750, 1000];
+    var step = yMax >= 1000 ? 250 : 100;
+    var yTicks = [];
+    for (var t = 0; t <= yMax; t += step) yTicks.push(t);
     yTicks.forEach(function(t){
       var y = yFor(t);
       svg.appendChild(el("line", {x1:padL, x2:W-padR, y1:y, y2:y, class:"grid-line"}));
@@ -513,24 +612,22 @@
     svg.appendChild(el("line", {x1:padL, x2:padL, y1:padT, y2:H-padB, class:"baseline-line"}));
     svg.appendChild(el("line", {x1:padL, x2:W-padR, y1:H-padB, y2:H-padB, class:"baseline-line"}));
 
-    // budget cap line
-    var capY = yFor(TOTAL_BUDGET_HOURS);
+    var capY = yFor(totalBudgetHours);
     svg.appendChild(el("line", {x1:padL, x2:W-padR, y1:capY, y2:capY, class:"budget-cap"}));
     var capLabel = el("text", {x:W-padR, y:capY-8, class:"budget-cap-label", "text-anchor":"end"});
-    capLabel.textContent = "791 hrs budgeted";
+    capLabel.textContent = totalBudgetHours.toLocaleString("en-US") + " hrs budgeted";
     svg.appendChild(capLabel);
 
-    // x-axis date labels (first, ~middle, last)
-    var labelIdx = [0, 5, 9, timeSeries.length-1];
+    var n = timeSeries.length;
+    var labelIdx = n <= 4 ? timeSeries.map(function(_,i){return i;}) : [0, Math.round(n*0.33), Math.round(n*0.66), n-1];
     labelIdx.forEach(function(i){
       var pt = timeSeries[i];
       var x = xFor(pt.date);
-      var lbl = el("text", {x:x, y:H-padB+18, class:"axis-label", "text-anchor": i===0 ? "start" : (i===timeSeries.length-1 ? "end" : "middle")});
+      var lbl = el("text", {x:x, y:H-padB+18, class:"axis-label", "text-anchor": i===0 ? "start" : (i===n-1 ? "end" : "middle")});
       lbl.textContent = fmtDateLabel(pt.date);
       svg.appendChild(lbl);
     });
 
-    // area path
     var linePts = timeSeries.map(function(p){ return [xFor(p.date), yFor(p.cum)]; });
     var areaD = "M" + linePts[0][0] + "," + yFor(0);
     linePts.forEach(function(p){ areaD += " L" + p[0] + "," + p[1]; });
@@ -540,11 +637,9 @@
     var lineD = "M" + linePts.map(function(p){ return p[0]+","+p[1]; }).join(" L");
     svg.appendChild(el("path", {d:lineD, class:"burn-line"}));
 
-    // guide line for hover
     var guide = el("line", {x1:0, x2:0, y1:padT, y2:H-padB, class:"guide-line"});
     svg.appendChild(guide);
 
-    // points + hit targets
     var pointEls = [];
     timeSeries.forEach(function(p, i){
       var x = xFor(p.date), y = yFor(p.cum);
@@ -552,22 +647,20 @@
       var dot = el("circle", {cx:x, cy:y, r: isLast ? 5 : 3.5, class: isLast ? "burn-point-end" : "burn-point"});
       svg.appendChild(dot);
       var hit = el("circle", {cx:x, cy:y, r:14, class:"burn-hit", tabindex:"0", role:"img",
-        "aria-label": fmtDateLabel(p.date) + ": " + fmtHrs(p.cum) + " logged, " + fmtHrs(TOTAL_BUDGET_HOURS - p.cum) + " remaining"});
+        "aria-label": fmtDateLabel(p.date) + ": " + fmtHrs(p.cum) + " logged, " + fmtHrs(totalBudgetHours - p.cum) + " remaining"});
       svg.appendChild(hit);
       pointEls.push({x:x, y:y, data:p, hit:hit});
     });
 
-    // end label
     var endPt = linePts[linePts.length-1];
-    var endLbl = el("text", {x:endPt[0]-10, y:endPt[1]-10, class:"end-label", "text-anchor":"end"});
-    endLbl.textContent = "60.0 hrs";
+    var lastPoint = timeSeries[timeSeries.length-1];
+    var endLbl = el("text", {x:endPt[0]-10, y:endPt[1]-16, class:"end-label", "text-anchor":"end"});
+    endLbl.textContent = fmtHrs(lastPoint.cum);
     svg.appendChild(endLbl);
-    var endSub = el("text", {x:endPt[0]-10, y:endPt[1]+6, class:"end-label-sub", "text-anchor":"end"});
-    endSub.textContent = "as of Sep 3";
+    var endSub = el("text", {x:endPt[0]-10, y:endPt[1]-2, class:"end-label-sub", "text-anchor":"end"});
+    endSub.textContent = "as of " + fmtDateLabel(lastPoint.date);
     svg.appendChild(endSub);
 
-    // tooltip wiring
-    var shell = document.getElementById("chart-shell");
     var tooltip = document.getElementById("chart-tooltip");
     var ttDate = document.getElementById("tt-date");
     var ttHours = document.getElementById("tt-hours");
@@ -578,9 +671,9 @@
       var scale = rect.width / W;
       guide.setAttribute("x1", pt.x); guide.setAttribute("x2", pt.x);
       guide.style.opacity = 1;
-      ttDate.textContent = fmtDateLabel(pt.data.date) + ", 2026";
+      ttDate.textContent = fmtDateLabel(pt.data.date) + ", " + pt.data.date.slice(0,4);
       ttHours.textContent = fmtHrs(pt.data.cum);
-      ttRemaining.textContent = fmtHrs(TOTAL_BUDGET_HOURS - pt.data.cum);
+      ttRemaining.textContent = fmtHrs(totalBudgetHours - pt.data.cum);
       tooltip.style.left = (pt.x * scale) + "px";
       tooltip.style.top = (pt.y * scale) + "px";
       tooltip.classList.add("show");
@@ -594,11 +687,12 @@
       pt.hit.addEventListener("blur", hideAll);
     });
     svg.addEventListener("mouseleave", hideAll);
-  })();
+  }
 
   /* ---------------- per-line-item meters ---------------- */
-  (function buildMeters(){
+  function buildMeters(){
     var container = document.getElementById("meter-groups");
+    container.innerHTML = "";
     var phases = ["Planning", "Development", "PM", "UX"];
     var tooltip = document.getElementById("meter-tooltip");
     var mtCode = document.getElementById("mt-code");
@@ -700,33 +794,57 @@
       container.appendChild(group);
     });
     container.style.position = "relative";
-  })();
+  }
 
   /* ---------------- recent activity table ---------------- */
-  (function buildTable(){
+  function buildTable(entries){
     var body = document.getElementById("activity-body");
-    recent.forEach(function(r){
+    body.innerHTML = "";
+    var sorted = entries.slice().sort(function(a,b){
+      return a.date < b.date ? 1 : (a.date > b.date ? -1 : 0);
+    }).slice(0, 14);
+
+    sorted.forEach(function(r){
+      var extracted = extractCode(r.description);
       var tr = document.createElement("tr");
 
       var tdDate = document.createElement("td");
-      tdDate.className = "date"; tdDate.textContent = r.date;
+      tdDate.className = "date"; tdDate.textContent = fmtDateLabel(r.date);
 
       var tdPerson = document.createElement("td");
       tdPerson.className = "person"; tdPerson.textContent = r.person;
 
       var tdCode = document.createElement("td");
-      tdCode.className = "code"; tdCode.textContent = r.code;
+      tdCode.className = "code"; tdCode.textContent = extracted ? extracted.code : "—";
 
       var tdDesc = document.createElement("td");
-      tdDesc.textContent = r.desc;
+      tdDesc.textContent = extracted ? extracted.rest : r.description;
 
       var tdHrs = document.createElement("td");
-      tdHrs.className = "hrs"; tdHrs.textContent = r.hrs.toFixed(2);
+      tdHrs.className = "hrs"; tdHrs.textContent = r.hours.toFixed(2);
 
       tr.appendChild(tdDate); tr.appendChild(tdPerson); tr.appendChild(tdCode); tr.appendChild(tdDesc); tr.appendChild(tdHrs);
       body.appendChild(tr);
     });
-  })();
+  }
+
+  fetch(CSV_PATH).then(function(resp){
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    return resp.text();
+  }).then(function(text){
+    var rows = parseCSV(text);
+    var entries = [];
+    rows.forEach(function(r){
+      var date = normalizeDate(r.date);
+      var hours = parseFloat(r.hours);
+      if (!date || isNaN(hours)) return;
+      entries.push({ date: date, person: r.person || "", hours: hours, description: r.description || "" });
+    });
+    if (!entries.length) throw new Error("time_entries.csv had no valid rows");
+    render(entries);
+  }).catch(function(err){
+    showError("Couldn't load time_entries.csv (" + err.message + "). Check the file is in the same folder as this page and columns are date,person,hours,description.");
+  });
 
 })();
 </script>
