@@ -398,7 +398,7 @@
   <footer class="notes">
     <div><b>Reading the numbers:</b> hours are the source of truth; dollar figures are hours × the $160/hr blended rate used in the Scope &amp; Time Tracker. $126,560 across 791 hours is the agreed budget — AVH19 (documentation &amp; editor training) is priced at $0 since AVH owns that work, so it's excluded from the tracked hours and dollars. A separate $10,000 early&#8209;acceptance discount, applied through Aug 28, 2026, brings the net contract total to $116,560; that discount isn't spread across line items, so it isn't reflected in the per&#8209;item burndown above.</div>
     <div><b>Assumptions:</b> entries logged as "AHV21" are normalized to AVH21 (Project management &amp; coordination), likely a typo in the time tool. Entries with no leading scope code are folded into AVH21 — <span id="uncoded-note"></span> AVH19 and AVH20 carry no budgeted hours and show as empty lines.</div>
-    <div><b>Updating this dashboard:</b> replace <code class="mono">time_entries.csv</code> in this repo with the latest export from <a href="https://mapletonhillmedia.basecamphq.com/projects/15410215-contentful-build/time_entries" style="color:inherit;">Basecamp's time entries</a> (columns: <code class="mono">date,person,hours,description</code>, one row per entry, description starting with the AVH## code) and push — the page recalculates everything from the file automatically, no editing of this page required.</div>
+    <div><b>Updating this dashboard:</b> replace <code class="mono">time_entries.csv</code> in this repo with the latest export from <a href="https://mapletonhillmedia.basecamphq.com/projects/15410215-contentful-build/time_entries" style="color:inherit;">Basecamp's time entries</a> (Basecamp's own export is tab delimited with a <code class="mono">date, person, hours, description</code> plus a few extra columns Basecamp adds; a comma delimited file with just those four columns also works &mdash; either is auto detected) and push &mdash; the page recalculates everything from the file automatically, no editing of this page required.</div>
   </footer>
 
 </div>
@@ -454,8 +454,17 @@
     return d.toLocaleDateString("en-US", {month:"short", day:"numeric"});
   }
 
-  /* ---------------- CSV parsing (RFC4180-ish: handles quoted fields, commas, quotes) ---------------- */
+  /* ---------------- CSV/TSV parsing (RFC4180-ish: handles quoted fields, commas/tabs, quotes) ----------------
+     Basecamp's own export is tab-delimited with extra columns (todo, list, company, project);
+     a hand-built file may still be comma-delimited. Delimiter is auto-detected from the header line. */
+  function detectDelimiter(text){
+    var firstLine = text.split(/\r\n|\n|\r/)[0] || "";
+    var tabs = (firstLine.match(/\t/g) || []).length;
+    var commas = (firstLine.match(/,/g) || []).length;
+    return tabs > commas ? "\t" : ",";
+  }
   function parseCSV(text){
+    var delim = detectDelimiter(text);
     var rows = [];
     var row = [];
     var field = "";
@@ -469,7 +478,7 @@
         } else field += c;
       } else {
         if (c === '"') inQuotes = true;
-        else if (c === ','){ row.push(field); field = ""; }
+        else if (c === delim){ row.push(field); field = ""; }
         else if (c === '\n' || c === '\r'){
           if (c === '\r' && text[i+1] === '\n') i++;
           row.push(field); field = "";
@@ -489,7 +498,7 @@
   }
 
   /* ---------------- code extraction: "AVH21 - Standup" -> {code:"AVH21", rest:"Standup"} ---------------- */
-  var CODE_RE = /^\s*(AVH|AHV)\s*0*([0-9]{1,2})\b[\s:.\-–—]*(.*)$/i;
+  var CODE_RE = /^\s*(AVH|AHV)[\s\-]*0*([0-9]{1,2})\b[\s:.\-–—]*(.*)$/i;
   function extractCode(desc){
     var m = CODE_RE.exec(desc || "");
     if (!m) return null;
@@ -843,7 +852,7 @@
     if (!entries.length) throw new Error("time_entries.csv had no valid rows");
     render(entries);
   }).catch(function(err){
-    showError("Couldn't load time_entries.csv (" + err.message + "). Check the file is in the same folder as this page and columns are date,person,hours,description.");
+    showError("Couldn't load time_entries.csv (" + err.message + "). Check the file is in the same folder as this page and has date, person, hours, description columns (tab or comma delimited).");
   });
 
 })();
