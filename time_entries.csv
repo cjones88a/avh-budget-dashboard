@@ -1,47 +1,78 @@
-date,person,hours,description
-2026-07-28,Colt Jones,4.0,"AVH21 - feature list review w/team & gianna, standup"
-2026-07-30,Colt Jones,2.0,AVH21 - standup & feature list
-2026-08-03,Colt Jones,2.0,AVH21 - planning & scope
-2026-08-04,Colt Jones,2.0,"AVH21 - planning w/geoff & ehren, standup"
-2026-08-04,Elena Dotsenko,0.5,AVH21 - mtg w/colt & reviewing proposal
-2026-08-05,Elena Dotsenko,0.5,AVH21 - mtg w/colt reviewing proposal estimates
-2026-08-06,Colt Jones,1.0,AVH21 - standup & call w/hunter
-2026-08-07,Colt Jones,1.0,AVH21 - Provider services call
-2026-08-07,Ehren Dames,1.0,AVH08 - Provider Finder Meeting
-2026-08-11,Colt Jones,3.0,AVH21 - proposal building and review w/MH team + standup
-2026-08-12,Colt Jones,4.0,AVH21 - contentful work
-2026-08-13,Colt Jones,2.0,AVH21 - standup + project timeline
-2026-08-20,Colt Jones,1.0,AVH21 - standup & design review
-2026-08-31,Jaquelyn Walo,18.0,"AVH23 - August Hours Migrated from T&M Project - Design tweaks for dev, final designs x button states, standup, final design tweaks + component mapping, meet with Jason x Paul, design tweaks and updates, Jacque/Sydney interview"
-2026-09-01,Colt Jones,4.0,"AVH21 - Project setup, linear, claude prep"
-2026-09-01,Ehren Dames,0.25,Standup
-2026-09-01,Ehren Dames,1.0,AVH21 - Internal Kickoff
-2026-09-01,Geoffrey Lehr,5.5,AVH01 - Component and Content Modeling
-2026-09-01,Geoffrey Lehr,1.0,AVH03 - Infra Setup / Planning
-2026-09-01,Geoffrey Lehr,1.0,AVH21 - Internal Kickoff
-2026-09-02,Colt Jones,3.0,AVH21 - backlog creation
-2026-09-02,Geoffrey Lehr,5.75,AVH01 - Research & Planning
-2026-09-03,Colt Jones,2.0,AHV21 - standup + backlog refinement
-2026-09-03,Ehren Dames,0.25,Standup
-2026-09-03,Geoffrey Lehr,8.25,AVH01 - Research & Planning
-2026-09-04,Ehren Dames,1.0,AVH02 - initialize repo with Next.js
-2026-09-04,Ehren Dames,0.75,AHV21 - Ticket Grooming Meeting
-2026-09-04,Geoffrey Lehr,3.0,AVH01 - Research & Planning
-2026-09-04,Geoffrey Lehr,2.5,AVH04 - Page Buildout: Birth Center service page
-2026-09-04,Geoffrey Lehr,1.0,"AVH21 - Meeting: Contentful & Claude w/ Rob, Meeting: AVH (Planning)"
-2026-09-08,Colt Jones,3.0,AVH21 - standup / backlog build
-2026-09-08,Ehren Dames,0.25,AVH21 - Standup
-2026-09-08,Geoffrey Lehr,5.5,AVH04 - Page Buildout: Birth Center service page
-2026-09-09,Colt Jones,3.0,AVH21 - agent building & backlog review
-2026-09-09,Ehren Dames,3.5,AVH04 - Who We Are Buildout
-2026-09-09,Ehren Dames,0.5,AVH21 - Meeting: Checkin
-2026-09-09,Geoffrey Lehr,8.0,"AVH04 - Page Buildout: Birth Center service page, Page Buildout: Lactation Services service page"
-2026-09-09,Geoffrey Lehr,0.5,AVH21 - Meeting: Checkin
-2026-09-10,Colt Jones,3.0,AVH21 - standup / agent build
-2026-09-10,Ehren Dames,0.5,AVH21 - Meeting: Checkin
-2026-09-10,Ehren Dames,1.25,AVH04 - COL-127: build out on frontend
-2026-09-10,Ehren Dames,0.75,AVH04 - COL-127: prompt prep for building frontend
-2026-09-10,Ehren Dames,1.25,"AVH04 - COL-125, 130: buildout of Who We Are"
-2026-09-10,Ehren Dames,0.25,AVH21 - Standup
-2026-09-10,Geoffrey Lehr,5.75,"AVH04 - Page Buildout: Lactation Services service page, Buildout: Header & Skills refinement"
-2026-09-10,Geoffrey Lehr,0.5,AVH21 - Meeting: Checkin
+date	person	hours	description	todo	list	company	project
+2026-09-22	Colt Jones	4.0	AVH-21 backlog building & call w/ehren			Aspen Valley Hospital	Contentful Build
+2026-09-21	Colt Jones	1.0	AVH-21			Aspen Valley Hospital	Contentful Build
+2026-09-21	Ehren Dames	0.25	AVH-04 - COL-236: review PR; pull latest from main; resolving conflicts			Aspen Valley Hospital	Contentful Build
+2026-09-21	Ehren Dames	0.5	AVH-04 - PR review			Aspen Valley Hospital	Contentful Build
+2026-09-21	Ehren Dames	0.25	AVH21 - DEV Touchbase			Aspen Valley Hospital	Contentful Build
+2026-09-21	Geoffrey Lehr	6.25	AVH04 - Article Type, Healthy Journey Pages, PR Comment Fixes & Favicon, Neurology Service Page			Aspen Valley Hospital	Contentful Build
+2026-09-21	Geoffrey Lehr	0.25	AVH21 - Meeting: Morning Regroup w/ Ehren			Aspen Valley Hospital	Contentful Build
+2026-09-18	Ehren Dames	2.0	AVH04 - COL-219: working on page build			Aspen Valley Hospital	Contentful Build
+2026-09-18	Geoffrey Lehr	5.25	AVH04 - Article Type, Healthy Journey Pages			Aspen Valley Hospital	Contentful Build
+2026-09-17	Ehren Dames	3.0	AVH04 - COL-219 - working on Endoscopy			Aspen Valley Hospital	Contentful Build
+2026-09-17	Ehren Dames	0.25	AVH04 - Review PR; Collaborate with Geoff			Aspen Valley Hospital	Contentful Build
+2026-09-17	Geoffrey Lehr	8.25	AVH04 - Service model changes, Build issues, ReadMore Component, Article Type, Nutrition Services Page			Aspen Valley Hospital	Contentful Build
+2026-09-16	Ehren Dames	0.25	AVH21 - Meeting: Checkin			Aspen Valley Hospital	Contentful Build
+2026-09-16	Ehren Dames	1.5	AVH04 - Endoscopy content model development			Aspen Valley Hospital	Contentful Build
+2026-09-16	Ehren Dames	0.5	AVH04 - Checking access to Github Enterprise; Review what has been migrated; set up local repo from Github Enterprise			Aspen Valley Hospital	Contentful Build
+2026-09-16	Geoffrey Lehr	5.0	AVH03 - COL-6 - Prod build			Aspen Valley Hospital	Contentful Build
+2026-09-16	Geoffrey Lehr	2.25	AVH04 - Migrate to new repo, refine service content model			Aspen Valley Hospital	Contentful Build
+2026-09-16	Geoffrey Lehr	0.25	AVH21 - Meeting: AVH Progression			Aspen Valley Hospital	Contentful Build
+2026-09-16	Colt Jones	1.0	AVH21 - backlog prioritization and hydration			Aspen Valley Hospital	Contentful Build
+2026-09-15	Geoffrey Lehr	5.25	AVH03 - Moving to new repo, amplify setup			Aspen Valley Hospital	Contentful Build
+2026-09-15	Geoffrey Lehr	0.75	AVH21 - Meeting: AVH Progression			Aspen Valley Hospital	Contentful Build
+2026-09-15	Ehren Dames	1.25	AVH21 - Meeting: Checkin			Aspen Valley Hospital	Contentful Build
+2026-09-15	Ehren Dames	1.25	AVH04 - Review work completed with Who We Are			Aspen Valley Hospital	Contentful Build
+2026-09-15	Ehren Dames	0.25	AVH21 - Standup			Aspen Valley Hospital	Contentful Build
+2026-09-15	Colt Jones	1.0	AVH01 - Content Model Review + backlog + standup			Aspen Valley Hospital	Contentful Build
+2026-09-14	Colt Jones	1.0	AVH21 - backlog definition			Aspen Valley Hospital	Contentful Build
+2026-09-14	Ehren Dames	1.25	AVH01 - Meeting: Content Modeling w/Geoff			Aspen Valley Hospital	Contentful Build
+2026-09-14	Ehren Dames	3.5	AVH04 - Review Geoff's branch & model; Test approach with Who We Are			Aspen Valley Hospital	Contentful Build
+2026-09-14	Geoffrey Lehr	1.25	AVH01 - Meeting: Content Modeling w/ Ehren			Aspen Valley Hospital	Contentful Build
+2026-09-11	Ehren Dames	0.5	AVH21 - Meeting: Checkin			Aspen Valley Hospital	Contentful Build
+2026-09-11	Ehren Dames	2.25	AVH04 - Review Geoff's branch & model; Test approach with Who We Are			Aspen Valley Hospital	Contentful Build
+2026-09-11	Geoffrey Lehr	2.25	AVH04 - Review Ehren's branches & models			Aspen Valley Hospital	Contentful Build
+2026-09-11	Geoffrey Lehr	0.5	AVH21 - Meeting: Checkin			Aspen Valley Hospital	Contentful Build
+2026-09-10	Colt Jones	3.0	AVH21 - standup / agent build			Aspen Valley Hospital	Contentful Build
+2026-09-10	Ehren Dames	0.5	AVH21 - Meeting: Checkin			Aspen Valley Hospital	Contentful Build
+2026-09-10	Ehren Dames	1.25	AVH04 - COL-127: build out on frontend			Aspen Valley Hospital	Contentful Build
+2026-09-10	Ehren Dames	0.75	AVH04 - COL-127: prompt prep for building frontend			Aspen Valley Hospital	Contentful Build
+2026-09-10	Ehren Dames	1.25	AVH04 - COL-125, 130: buildout of Who We Are			Aspen Valley Hospital	Contentful Build
+2026-09-10	Ehren Dames	0.25	AVH21 - Standup			Aspen Valley Hospital	Contentful Build
+2026-09-10	Geoffrey Lehr	5.75	AVH04 - Page Buildout: Lactation Services service page, Buildout: Header & Skills refinement			Aspen Valley Hospital	Contentful Build
+2026-09-10	Geoffrey Lehr	0.5	AVH21 - Meeting: Checkin			Aspen Valley Hospital	Contentful Build
+2026-09-09	Colt Jones	3.0	AVH21 - agent building & backlog review			Aspen Valley Hospital	Contentful Build
+2026-09-09	Ehren Dames	3.5	AVH04 - Who We Are Buildout			Aspen Valley Hospital	Contentful Build
+2026-09-09	Ehren Dames	0.5	AVH21 - Meeting: Checkin			Aspen Valley Hospital	Contentful Build
+2026-09-09	Geoffrey Lehr	8.0	AVH04 - Page Buildout: Birth Center service page, Page Buildout: Lactation Services service page			Aspen Valley Hospital	Contentful Build
+2026-09-09	Geoffrey Lehr	0.5	AVH21 - Meeting: Checkin			Aspen Valley Hospital	Contentful Build
+2026-09-08	Colt Jones	3.0	AVH21 - standup / backlog build			Aspen Valley Hospital	Contentful Build
+2026-09-08	Ehren Dames	0.25	AVH21 - Standup			Aspen Valley Hospital	Contentful Build
+2026-09-08	Geoffrey Lehr	5.5	AVH04 - Page Buildout: Birth Center service page			Aspen Valley Hospital	Contentful Build
+2026-09-04	Ehren Dames	1.0	AVH02 - initialize repo with Next.js			Aspen Valley Hospital	Contentful Build
+2026-09-04	Ehren Dames	0.75	AHV21 - Ticket Grooming Meeting			Aspen Valley Hospital	Contentful Build
+2026-09-04	Geoffrey Lehr	3.0	AVH01 - Research & Planning			Aspen Valley Hospital	Contentful Build
+2026-09-04	Geoffrey Lehr	2.5	AVH04 - Page Buildout: Birth Center service page			Aspen Valley Hospital	Contentful Build
+2026-09-04	Geoffrey Lehr	1.0	AVH21 - Meeting: Contentful & Claude w/ Rob, Meeting: AVH (Planning)			Aspen Valley Hospital	Contentful Build
+2026-09-03	Geoffrey Lehr	8.25	AVH01 - Research & Planning			Aspen Valley Hospital	Contentful Build
+2026-09-03	Colt Jones	2.0	AHV21 - standup + backlog refinement			Aspen Valley Hospital	Contentful Build
+2026-09-03	Ehren Dames	0.25	AHV21 - Standup			Aspen Valley Hospital	Contentful Build
+2026-09-02	Geoffrey Lehr	5.75	AVH01 - Research & Planning			Aspen Valley Hospital	Contentful Build
+2026-09-02	Colt Jones	3.0	AVH21 - backlog creation			Aspen Valley Hospital	Contentful Build
+2026-09-01	Colt Jones	4.0	AHV21 - Project setup, linear, claude prep			Aspen Valley Hospital	Contentful Build
+2026-09-01	Ehren Dames	0.25	AVH21 - Standup			Aspen Valley Hospital	Contentful Build
+2026-09-01	Ehren Dames	1.0	AVH21 - Internal Kickoff			Aspen Valley Hospital	Contentful Build
+2026-09-01	Geoffrey Lehr	5.5	AVH01 - Component and Content Modeling			Aspen Valley Hospital	Contentful Build
+2026-09-01	Geoffrey Lehr	1.0	AVH03 - Infra Setup / Planning			Aspen Valley Hospital	Contentful Build
+2026-09-01	Geoffrey Lehr	1.0	AVH21 - Internal Kickoff			Aspen Valley Hospital	Contentful Build
+2026-08-31	Jaquelyn Walo	18.0	AVH23 - August Hours Migrated from T&M Project - Design tweaks for dev Final designs x button states Standup Final design tweaks + component mapping Meet with Jason x Paul Final design tweaks + component mapping Standup Design tweaks and updates Design updates Jacque meet Syndney interview Design updates Standup			Aspen Valley Hospital	Contentful Build
+2026-08-20	Colt Jones	1.0	AHV21 - standup & design review			Aspen Valley Hospital	Contentful Build
+2026-08-13	Colt Jones	2.0	AHV21 - standup + project timeline			Aspen Valley Hospital	Contentful Build
+2026-08-12	Colt Jones	4.0	AHV21 - contentful work			Aspen Valley Hospital	Contentful Build
+2026-08-11	Colt Jones	3.0	AHV21 - proposal building and review w/MH team + standup			Aspen Valley Hospital	Contentful Build
+2026-08-07	Ehren Dames	1.0	AVH08 - Provider Finder Meeting			Aspen Valley Hospital	Contentful Build
+2026-08-07	Colt Jones	1.0	AHV21 - Provider services call			Aspen Valley Hospital	Contentful Build
+2026-08-06	Colt Jones	1.0	AHV21 - standup & call w/hunter			Aspen Valley Hospital	Contentful Build
+2026-08-05	Elena Dotsenko	0.5	AVH21 - mtg w/colt reviewing proposal estimates			Aspen Valley Hospital	Contentful Build
+2026-08-04	Elena Dotsenko	0.5	AVH21 - mtg w/colt & reviewing proposal			Aspen Valley Hospital	Contentful Build
+2026-08-04	Colt Jones	2.0	AHV21 - planning w/geoff & ehren, standup			Aspen Valley Hospital	Contentful Build
+2026-08-03	Colt Jones	2.0	AHV21 - planning & scope			Aspen Valley Hospital	Contentful Build
