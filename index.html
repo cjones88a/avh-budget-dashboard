@@ -154,6 +154,32 @@
   .kpi .sub{ font-size:12.5px; color: var(--ink-muted); }
   .kpi .value .unit{ font-size: 15px; font-weight:500; color: var(--ink-2); margin-left:3px; }
 
+  /* ---------- billing card ---------- */
+  .bill-bars{ display:flex; flex-direction:column; gap:14px; margin-bottom:18px; }
+  .bill-bar-row{ display:grid; grid-template-columns: 150px minmax(0,1fr) 110px; gap:14px; align-items:center; font-size:13px; }
+  .bill-bar-row .bill-label{ color: var(--ink-2); }
+  .bill-bar-row .bill-fig{ text-align:right; font-weight:600; }
+  .bill-track{ position:relative; height:16px; background: var(--seq-track-light); border-radius:6px; overflow:hidden; display:flex; }
+  .bill-seg{ height:100%; }
+  .bill-seg.m0{ background: var(--planning); }
+  .bill-seg.m1{ background: var(--development); }
+  .bill-seg.m2{ background: var(--pm); }
+  .bill-seg.m3{ background: var(--ux); }
+  .bill-seg.logged{ background: var(--ink-muted); opacity:.55; }
+  .bill-months{
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap:1px;
+    background: var(--border); border:1px solid var(--border); border-radius:10px; overflow:hidden;
+  }
+  .bill-month{ background: var(--surface-card); padding:14px 16px; display:flex; flex-direction:column; gap:4px; min-width:0; }
+  .bill-month .label{ font-size:12px; color: var(--ink-2); display:flex; align-items:center; gap:6px; }
+  .bill-month .value{ font-size:20px; font-weight:600; }
+  .bill-month .sub{ font-size:12px; color: var(--ink-muted); }
+  .bill-swatch{ display:inline-block; width:9px; height:9px; border-radius:2px; }
+  .bill-swatch.m0{ background: var(--planning); }
+  .bill-swatch.m1{ background: var(--development); }
+  .bill-swatch.m2{ background: var(--pm); }
+  .bill-swatch.m3{ background: var(--ux); }
+
   /* ---------- section shell ---------- */
   section.card{
     background: var(--surface-card);
@@ -280,6 +306,8 @@
 
   @media (max-width: 720px){
     .kpi-row{ grid-template-columns: repeat(2,1fr); }
+    .bill-bar-row{ grid-template-columns: 1fr; row-gap:4px; }
+    .bill-bar-row .bill-fig{ text-align:left; }
     .meter-row, .meter-head-row{ grid-template-columns: 1fr; row-gap:6px; }
     .meter-figures, .meter-pct{ text-align:left; }
     .section-head{ flex-direction:column; align-items:flex-start; }
@@ -328,6 +356,32 @@
       <div class="sub" id="kpi-lines-started">—</div>
     </div>
   </div>
+
+  <section class="card" id="billing">
+    <div class="section-head">
+      <div>
+        <h2>Total billed</h2>
+        <p>Invoiced to AVH so far, by month, against the $126,560 budget. Billing figures are entered by hand in this page, not read from the time report.</p>
+      </div>
+      <div class="section-stat">
+        <div class="value tnum" id="billed-total">—</div>
+        <div class="label" id="billed-pct">of budget billed</div>
+      </div>
+    </div>
+    <div class="bill-bars">
+      <div class="bill-bar-row">
+        <span class="bill-label">Billed</span>
+        <div class="bill-track" id="bill-track-billed"></div>
+        <span class="bill-fig tnum" id="bill-fig-billed">—</span>
+      </div>
+      <div class="bill-bar-row">
+        <span class="bill-label">Logged at $160/hr</span>
+        <div class="bill-track" id="bill-track-logged"></div>
+        <span class="bill-fig tnum" id="bill-fig-logged">—</span>
+      </div>
+    </div>
+    <div class="bill-months" id="bill-months"></div>
+  </section>
 
   <section class="card" id="total-burndown">
     <div class="section-head">
@@ -397,6 +451,7 @@
 
   <footer class="notes">
     <div><b>Reading the numbers:</b> hours are the source of truth; dollar figures are hours × the $160/hr blended rate used in the Scope &amp; Time Tracker. $126,560 across 791 hours is the agreed budget — AVH19 (documentation &amp; editor training) is priced at $0 since AVH owns that work, so it's excluded from the tracked hours and dollars. A separate $10,000 early&#8209;acceptance discount, applied through Aug 28, 2026, brings the net contract total to $116,560; that discount isn't spread across line items, so it isn't reflected in the per&#8209;item burndown above.</div>
+    <div><b>Billing:</b> the Total billed card reads the <code class="mono">billedByMonth</code> list near the top of this page's script, not the time report. Add a line there when a new invoice goes out. Invoices go out as scope items are completed, so "Logged, not yet billed" (hours logged × $160, minus the amount billed) is work in progress that has not been invoiced yet and moves with every time report.</div>
     <div><b>Assumptions:</b> entries logged as "AHV21" are normalized to AVH21 (Project management &amp; coordination), likely a typo in the time tool. Entries with no leading scope code are folded into AVH21 — <span id="uncoded-note"></span> AVH19 and AVH20 carry no budgeted hours and show as empty lines.</div>
     <div><b>Updating this dashboard:</b> replace the CSV export in this repo with the latest export from <a href="https://mapletonhillmedia.basecamphq.com/projects/15410215-contentful-build/time_entries" style="color:inherit;">Basecamp's time entries</a> (as <code class="mono">time-report.csv</code> or <code class="mono">time_entries.csv</code> &mdash; whichever Basecamp hands you; tab or comma delimited, extra columns Basecamp adds are ignored) and push &mdash; the page recalculates everything from the file automatically, no editing of this page required.</div>
   </footer>
@@ -412,6 +467,14 @@
   // (time_entries.csv, time-report.csv). Try each in order; first one that
   // loads wins, so nobody has to remember to rename the file each week.
   var CSV_CANDIDATES = ["./time-report.csv", "./time_entries.csv"];
+
+  // Amounts invoiced to AVH, by month. Not in the CSV, so edit this list by
+  // hand when a new invoice goes out (one line per month, amount in dollars,
+  // items = the scope codes that month's invoice covered).
+  var billedByMonth = [
+    {label:"September 2026", amount:11200, items:"AVH01, AVH02"},
+    {label:"October 2026",   amount:26400, items:"AVH03, AVH04, AVH09, AVH13"}
+  ];
 
   // Budget lines: the estimate side never comes from the weekly CSV — it only
   // changes when the Scope & Time Tracker itself changes. Actual hours below
@@ -559,7 +622,7 @@
     document.getElementById("kpi-total-hrs").textContent = totalBudgetHours.toLocaleString("en-US");
     document.getElementById("kpi-total-usd").textContent = fmtUSD(totalBudgetHours*RATE) + " at $160/hr";
     document.getElementById("kpi-logged-hrs").textContent = (Math.round(totalActualHours*100)/100).toLocaleString("en-US");
-    document.getElementById("kpi-logged-usd").textContent = fmtUSD(totalActualHours*RATE) + " invoiced value";
+    document.getElementById("kpi-logged-usd").textContent = fmtUSD(totalActualHours*RATE) + " at $160/hr";
     document.getElementById("kpi-remaining-hrs").textContent = (Math.round(remainingHours*100)/100).toLocaleString("en-US");
     document.getElementById("kpi-remaining-usd").textContent = fmtUSD(remainingHours*RATE) + " left to burn";
     var consumedPct = totalBudgetHours > 0 ? (totalActualHours/totalBudgetHours*100) : 0;
@@ -575,9 +638,53 @@
     var statusEl = document.getElementById("data-status");
     statusEl.textContent = "Loaded " + entries.length + " entries from time_entries.csv · through " + asOf;
 
+    buildBilling(totalBudgetHours*RATE, totalActualHours*RATE);
     buildChart(timeSeries, totalBudgetHours);
     buildMeters();
     buildTable(entries);
+  }
+
+  /* ---------------- billing card ---------------- */
+  function buildBilling(budgetUSD, loggedUSD){
+    var billedUSD = billedByMonth.reduce(function(s,m){ return s + m.amount; }, 0);
+    var pctOf = function(n){ return budgetUSD > 0 ? Math.min(100, n/budgetUSD*100) : 0; };
+
+    document.getElementById("billed-total").textContent = fmtUSD(billedUSD);
+    document.getElementById("billed-pct").textContent = (budgetUSD > 0 ? (billedUSD/budgetUSD*100).toFixed(1) : "0.0") + "% of budget billed";
+    document.getElementById("bill-fig-billed").textContent = fmtUSD(billedUSD);
+    document.getElementById("bill-fig-logged").textContent = fmtUSD(loggedUSD);
+
+    var billedTrack = document.getElementById("bill-track-billed");
+    billedTrack.innerHTML = "";
+    billedByMonth.forEach(function(m, i){
+      var seg = document.createElement("div");
+      seg.className = "bill-seg m" + (i % 4);
+      seg.style.width = pctOf(m.amount) + "%";
+      seg.title = m.label + ": " + fmtUSD(m.amount);
+      billedTrack.appendChild(seg);
+    });
+
+    var loggedTrack = document.getElementById("bill-track-logged");
+    loggedTrack.innerHTML = "";
+    var lseg = document.createElement("div");
+    lseg.className = "bill-seg logged";
+    lseg.style.width = pctOf(loggedUSD) + "%";
+    loggedTrack.appendChild(lseg);
+
+    var wrap = document.getElementById("bill-months");
+    wrap.innerHTML = "";
+    function tile(labelHTML, value, sub){
+      var d = document.createElement("div");
+      d.className = "bill-month";
+      d.innerHTML = '<div class="label">' + labelHTML + '</div><div class="value tnum">' + value + '</div><div class="sub tnum">' + sub + '</div>';
+      wrap.appendChild(d);
+    }
+    billedByMonth.forEach(function(m, i){
+      tile('<span class="bill-swatch m' + (i % 4) + '"></span>' + m.label, fmtUSD(m.amount),
+           (budgetUSD > 0 ? (m.amount/budgetUSD*100).toFixed(1) : "0.0") + "% of budget" + (m.items ? " · " + m.items : ""));
+    });
+    tile("Budget not yet billed", fmtUSD(Math.max(0, budgetUSD - billedUSD)), "of " + fmtUSD(budgetUSD));
+    tile("Logged, not yet billed", fmtUSD(Math.max(0, loggedUSD - billedUSD)), "hours logged × $160, minus billed");
   }
 
   function showError(message){
